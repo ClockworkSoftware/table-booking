@@ -1,0 +1,9 @@
+*.gradle
+gradle
+build
+
+*.idea
+*.kotlin
+
+*.p12
+
