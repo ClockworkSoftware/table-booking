@@ -4,6 +4,7 @@ import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.apache.logging.log4j.kotlin.Logging
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 import org.springframework.web.filter.OncePerRequestFilter
@@ -16,9 +17,10 @@ class TransactionLoggerFilter : OncePerRequestFilter(), Logging {
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        logger.debug { "-> ${request.method} ${request.requestURI}" }
-        logger.debug { "${response.status} <- ${request.method} ${request.requestURI}" }
+        logger.debug("-> ${request.method} ${request.requestURI}")
 
         filterChain.doFilter(request, response)
+
+        logger.debug("${response.status} <- ${request.method} ${request.requestURI}")
     }
 }

@@ -7,5 +7,5 @@ data class RegistrationView(
     val password: String,
     val name: String,
     val surname: String,
-    val role: UserRole
+    val role: UserRole = UserRole.CLIENT
 )

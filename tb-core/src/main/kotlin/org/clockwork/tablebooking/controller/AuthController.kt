@@ -7,15 +7,19 @@ import org.clockwork.tablebooking.domain.User
 import org.clockwork.tablebooking.dto.security.AuthenticatedUserView
 import org.clockwork.tablebooking.dto.security.LoginView
 import org.clockwork.tablebooking.dto.security.RegistrationView
+import org.clockwork.tablebooking.dto.user.UserJwtView
 import org.clockwork.tablebooking.exception.UnauthorizedHttpException
 import org.clockwork.tablebooking.exception.UnprocessableEntityException
 import org.clockwork.tablebooking.repository.UserRepository
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import tools.jackson.databind.ObjectMapper
 import java.security.MessageDigest
 import java.time.Instant
+import kotlin.jvm.optionals.getOrNull
 
 @RestController
 @RequestMapping("/api/v1/public/auth")
@@ -27,8 +31,8 @@ class AuthController(
     var tokenLifespan: Long? = null
 
     @PostMapping("register")
-    fun register(body: RegistrationView): AuthenticatedUserView {
-        userRepo.findByLogin(body.login)?.run { throw UnprocessableEntityException("User already exists!") }
+    fun register(@RequestBody body: RegistrationView): AuthenticatedUserView {
+        userRepo.findByLogin(body.login).getOrNull()?.run { throw UnprocessableEntityException("User already exists!") }
 
         val user = userRepo.save(body.run { User(name, surname, login, password.sha256(), role) })
 
@@ -36,8 +40,8 @@ class AuthController(
     }
 
     @PostMapping("login")
-    fun login(body: LoginView): AuthenticatedUserView {
-        val user = userRepo.findByLoginAndPassword(body.login, body.password.sha256())
+    fun login(@RequestBody body: LoginView): AuthenticatedUserView {
+        val user = userRepo.findByLoginAndPassword(body.login, body.password.sha256()).getOrNull()
             ?: throw UnauthorizedHttpException("Login or password incorrect!")
         return AuthenticatedUserView(generateToken(user))
     }
@@ -46,13 +50,13 @@ class AuthController(
         return JWT.create()
             .withIssuedAt(Instant.now())
             .withExpiresAt(Instant.now().plusMillis(tokenLifespan!!))
-            .withPayload(
-                mapOf<String, String>(
-                    "sub" to user.id!!.toString(),
-                    "name" to user.name,
-                    "surname" to user.surname,
-                    "role" to user.role.name
-                )
+            .withPayload(ObjectMapper().writeValueAsString(
+                UserJwtView(
+                    user.id!!.toString(),
+                    user.name,
+                    user.surname,
+                    user.role
+                ))
             )
             .sign(Algorithm.RSA256(jwtConfig))
     }

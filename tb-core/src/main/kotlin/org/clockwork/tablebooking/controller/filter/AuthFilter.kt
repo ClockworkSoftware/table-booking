@@ -28,10 +28,8 @@ class AuthFilter (
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val httpRequest = (request as HttpServletRequest)
-
-        val authHeader: String? = httpRequest.getHeader("Authentication")
-        if (authHeader == null || authHeader.isEmpty()) {
+        val authHeader: String? = request.getHeader("Authorization")
+        if (authHeader == null || authHeader.isEmpty() || !authHeader.startsWith("Bearer ")) {
             if (!request.requestURI.startsWith("/api/v1/public/auth/")) {
                 throw UnauthorizedHttpException()
             }
@@ -39,7 +37,7 @@ class AuthFilter (
             return
         }
 
-        val jwt = JWT.decode(authHeader)
+        val jwt = JWT.decode(authHeader.substring("Bearer ".length))
         logger.debug { jwt.claims }
 
         filterChain.doFilter(request, response)

@@ -28,4 +28,5 @@ server:
 
 logging:
   level:
-    root: TRACE
+    org.clockwork: INFO
+    org.clockwork.tablebooking.controller: DEBUG

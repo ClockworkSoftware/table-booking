@@ -2,6 +2,7 @@ package org.clockwork.tablebooking.domain
 
 import jakarta.persistence.*
 import org.clockwork.tablebooking.dto.user.UserRole
+import org.springframework.transaction.annotation.Transactional
 
 @Entity
 @Table(name = "T_USER")
