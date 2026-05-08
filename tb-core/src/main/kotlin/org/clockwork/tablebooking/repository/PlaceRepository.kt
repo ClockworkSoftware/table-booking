@@ -4,20 +4,23 @@ import jakarta.data.repository.Delete
 import jakarta.data.repository.Find
 import jakarta.data.repository.Repository
 import jakarta.data.repository.Save
-import org.clockwork.tablebooking.domain.User
+import org.clockwork.tablebooking.domain.Place
 import java.util.*
 
 @Repository
-interface UserRepository {
+interface PlaceRepository {
 
     @Find
-    fun findByLogin(login: String): Optional<User>
+    fun findAll(): List<Place>
 
     @Find
-    fun findByLoginAndPassword(login: String, password: String): Optional<User>
+    fun findById(id: Long): Optional<Place>
+
+    @Find
+    fun findByLabelNumber(labelNumber: Int): Optional<Place>
 
     @Save
-    fun save(user: User): User
+    fun save(user: Place): Place
 
     @Delete
     fun deleteById(id: Long)

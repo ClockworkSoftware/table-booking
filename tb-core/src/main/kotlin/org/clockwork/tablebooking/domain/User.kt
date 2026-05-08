@@ -2,7 +2,6 @@ package org.clockwork.tablebooking.domain
 
 import jakarta.persistence.*
 import org.clockwork.tablebooking.dto.user.UserRole
-import org.springframework.transaction.annotation.Transactional
 
 @Entity
 @Table(name = "T_USER")
@@ -11,8 +10,8 @@ data class User (
     val surname: String,
 
     @Column(unique = true)
-    var login: String,
-    var password: String,
+    val login: String,
+    val password: String,
 
     @Enumerated(EnumType.STRING)
     var role: UserRole,

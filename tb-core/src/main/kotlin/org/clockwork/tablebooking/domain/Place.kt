@@ -4,15 +4,38 @@ import jakarta.persistence.Column
 import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.Id
+import org.clockwork.tablebooking.dto.place.CreatePlaceView
+import org.clockwork.tablebooking.dto.place.PlaceView
 
 @Entity
 data class Place(
+    @Column(unique = true)
+    val labelNumber: Int,
+    val reservationPrice: Double,
+    val capacity: Int
+) {
     @Id
     @GeneratedValue
-    val id: Long,
+    var id: Long? = null
 
-    @Column(unique = true)
-    var labelNumber: Int,
-    var reservationPrice: Double,
-    var capacity: Int
-)
+    fun toDto(): PlaceView {
+        return PlaceView(
+            id!!,
+            labelNumber,
+            reservationPrice,
+            capacity
+        )
+    }
+
+    companion object {
+        fun fromDto(dto: CreatePlaceView): Place {
+            dto.run {
+                return Place(
+                    labelNumber,
+                    reservationPrice,
+                    capacity
+                )
+            }
+        }
+    }
+}

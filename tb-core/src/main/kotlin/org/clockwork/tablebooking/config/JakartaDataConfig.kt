@@ -1,11 +1,8 @@
 package org.clockwork.tablebooking.config
 
 import jakarta.persistence.EntityManagerFactory
-import org.clockwork.tablebooking.repository.UserRepository
-import org.clockwork.tablebooking.repository.UserRepository_
 import org.hibernate.SessionFactory
 import org.hibernate.StatelessSession
-import org.springframework.beans.factory.ObjectProvider
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
