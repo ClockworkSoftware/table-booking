@@ -1,10 +1,6 @@
 package org.clockwork.tablebooking.domain
 
-import jakarta.persistence.Column
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.Id
-import org.clockwork.tablebooking.dto.place.CreatePlaceView
+import jakarta.persistence.*
 import org.clockwork.tablebooking.dto.place.PlaceView
 
 @Entity
@@ -12,7 +8,14 @@ data class Place(
     @Column(unique = true)
     val labelNumber: Int,
     val reservationPrice: Double,
-    val capacity: Int
+    val guestCapacity: Int,
+
+    @ManyToOne
+    @JoinColumn(name = "establishment_id", nullable = false)
+    val establishment: Establishment,
+
+    @OneToMany(orphanRemoval = true, mappedBy = "place")
+    val reservations: List<Reservation> = listOf()
 ) {
     @Id
     @GeneratedValue
@@ -23,19 +26,7 @@ data class Place(
             id!!,
             labelNumber,
             reservationPrice,
-            capacity
+            guestCapacity
         )
-    }
-
-    companion object {
-        fun fromDto(dto: CreatePlaceView): Place {
-            dto.run {
-                return Place(
-                    labelNumber,
-                    reservationPrice,
-                    capacity
-                )
-            }
-        }
     }
 }

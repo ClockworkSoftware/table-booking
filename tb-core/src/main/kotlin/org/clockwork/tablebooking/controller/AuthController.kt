@@ -8,7 +8,7 @@ import org.clockwork.tablebooking.dto.security.AuthenticatedUserView
 import org.clockwork.tablebooking.dto.security.LoginView
 import org.clockwork.tablebooking.dto.security.RegistrationView
 import org.clockwork.tablebooking.dto.user.UserJwtView
-import org.clockwork.tablebooking.exception.UnauthorizedHttpException
+import org.clockwork.tablebooking.exception.UnauthorizedException
 import org.clockwork.tablebooking.exception.UnprocessableEntityException
 import org.clockwork.tablebooking.repository.UserRepository
 import org.springframework.beans.factory.annotation.Value
@@ -42,7 +42,7 @@ class AuthController(
     @PostMapping("login")
     fun login(@RequestBody body: LoginView): AuthenticatedUserView {
         val user = userRepo.findByLoginAndPassword(body.login, body.password.sha256()).getOrNull()
-            ?: throw UnauthorizedHttpException("Login or password incorrect!")
+            ?: throw UnauthorizedException("Login or password incorrect!")
         return AuthenticatedUserView(generateToken(user))
     }
 

@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Component
-abstract class SecuredController {
+abstract class BaseSecuredController {
     @Autowired
     lateinit var userContext: UserContext
 }

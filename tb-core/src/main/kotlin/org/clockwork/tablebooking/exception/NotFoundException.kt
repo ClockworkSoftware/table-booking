@@ -1,3 +1,3 @@
 package org.clockwork.tablebooking.exception
 
-class NotFoundException(message: String?) : CommonHttpException(404, message)
+open class NotFoundException(message: String? = null) : CommonHttpException(404, message)

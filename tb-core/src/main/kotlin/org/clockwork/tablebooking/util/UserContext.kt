@@ -2,7 +2,7 @@ package org.clockwork.tablebooking.util
 
 import org.clockwork.tablebooking.dto.user.UserJwtView
 import org.clockwork.tablebooking.dto.user.UserRole
-import org.clockwork.tablebooking.exception.ForbiddenHttpException
+import org.clockwork.tablebooking.exception.ForbiddenException
 import org.springframework.context.annotation.Scope
 import org.springframework.context.annotation.ScopedProxyMode
 import org.springframework.stereotype.Component
@@ -18,6 +18,6 @@ class UserContext {
     }
 
     fun requireRole(vararg requiredRoles: UserRole) {
-        if (!hasRole(*requiredRoles)) throw ForbiddenHttpException("No access")
+        if (!hasRole(*requiredRoles)) throw ForbiddenException("No access")
     }
 }

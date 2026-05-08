@@ -1,9 +1,6 @@
 package org.clockwork.tablebooking.domain
 
-import jakarta.persistence.Entity
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.Id
-import jakarta.persistence.ManyToOne
+import jakarta.persistence.*
 import java.time.Instant
 
 @Entity
@@ -17,7 +14,8 @@ data class Reservation (
     var begun: Boolean = false,
 
     @ManyToOne
-    val user: User,
+    val client: User,
     @ManyToOne
+    @JoinColumn(name = "place_id")
     val place: Place
 )
