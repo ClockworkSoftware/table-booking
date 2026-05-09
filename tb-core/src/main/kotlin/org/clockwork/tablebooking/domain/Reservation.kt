@@ -5,17 +5,24 @@ import java.time.Instant
 
 @Entity
 data class Reservation (
-    @Id
-    @GeneratedValue
-    val id: Long,
-
     var start: Instant,
     var finish: Instant,
-    var begun: Boolean = false,
+    var begun: Boolean,
 
     @ManyToOne
+    @JoinColumn(name = "client_id")
     val client: User,
     @ManyToOne
     @JoinColumn(name = "place_id")
     val place: Place
-)
+) {
+    @Id
+    @GeneratedValue
+    var id: Long? = null
+
+    fun intersects(otherStart: Instant, otherEnd: Instant): Boolean {
+        val range = start..finish
+        return otherStart in range || otherEnd in range
+    }
+
+}

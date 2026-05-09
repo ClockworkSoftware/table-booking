@@ -2,13 +2,14 @@ package org.clockwork.tablebooking.domain
 
 import jakarta.persistence.*
 import org.clockwork.tablebooking.dto.place.PlaceView
+import java.time.Instant
 
 @Entity
 data class Place(
     @Column(unique = true)
-    val labelNumber: Int,
-    val reservationPrice: Double,
-    val guestCapacity: Int,
+    var labelNumber: Int,
+    var reservationPrice: Double,
+    var guestCapacity: Int,
 
     @ManyToOne
     @JoinColumn(name = "establishment_id", nullable = false)
@@ -28,5 +29,9 @@ data class Place(
             reservationPrice,
             guestCapacity
         )
+    }
+
+    fun isFreeBetween(start: Instant, end: Instant): Boolean {
+        return reservations.none { it.intersects(start, end) }
     }
 }
