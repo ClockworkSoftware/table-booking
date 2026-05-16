@@ -19,7 +19,7 @@ spring:
   application:
     name: TableBooking
 server:
-  port: 8080
+  port: 443
   ssl:
     enabled: true
     key-store-type: PKCS12

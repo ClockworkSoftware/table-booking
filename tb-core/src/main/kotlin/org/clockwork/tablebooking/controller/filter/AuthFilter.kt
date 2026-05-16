@@ -31,7 +31,7 @@ class AuthFilter (
         filterChain: FilterChain
     ) {
         val authHeader: String? = request.getHeader("Authorization")
-        if (authHeader == null || authHeader.isEmpty() || !authHeader.startsWith("Bearer ")) {
+        if (authHeader.isNullOrEmpty() || !authHeader.startsWith("Bearer ")) {
             if (!request.requestURI.startsWith("/api/v1/public/auth/")) {
                 throw UnauthorizedException()
             }

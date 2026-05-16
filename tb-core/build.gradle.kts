@@ -1,31 +1,19 @@
 plugins {
-	kotlin("jvm") version "2.2.21"
-    kotlin("kapt") version "2.3.21"
+    kotlin("jvm")
+    kotlin("kapt")
 	kotlin("plugin.spring") version "2.2.21"
 	kotlin("plugin.jpa") version "2.2.21"
 	id("org.springframework.boot") version "4.0.6"
 	id("io.spring.dependency-management") version "1.1.7"
 }
 
-java {
-	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
-	}
-}
-
 group = "org.clockwork.table-booking"
 version = "$version"
-
-repositories {
-	mavenCentral()
-}
 
 dependencies {
     // SPRING
     implementation("org.springframework.boot:spring-boot-starter-web")
 	implementation("org.springframework.boot:spring-boot-h2console")
-//	implementation("org.springframework.boot:spring-boot-starter-security")
-//	implementation("org.springframework.boot:spring-boot-starter-webmvc")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     // PERSISTENCE
     implementation("org.hibernate.orm:hibernate-core")
@@ -57,7 +45,6 @@ dependencies {
     testCompileOnly("org.projectlombok:lombok")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testAnnotationProcessor("org.projectlombok:lombok")
-    testImplementation("org.springframework.boot:spring-boot-starter-security-test")
 
     // HIBERNATE + JPA
     kapt("org.hibernate.orm:hibernate-processor:7.3.2.Final")

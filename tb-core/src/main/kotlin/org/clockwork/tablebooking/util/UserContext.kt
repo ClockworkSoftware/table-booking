@@ -14,7 +14,7 @@ class UserContext {
     lateinit var jwtView: UserJwtView
 
     fun hasRole(vararg allowedRoles: UserRole): Boolean {
-        return allowedRoles.contains(jwtView.role)
+        return allowedRoles.any { it >= jwtView.role }
     }
 
     fun requireRole(vararg requiredRoles: UserRole) {
