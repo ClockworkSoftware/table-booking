@@ -1,6 +1,9 @@
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.hilt.android)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.google.ksp)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
@@ -57,9 +60,17 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
 
+    // Navigation
+    implementation(libs.androidx.navigation)
+    implementation(libs.kotlinx.serialization)
+
     // API
     // Retrofit network library
     implementation(libs.retrofit)
+    // Hilt DI library
+    implementation(libs.hilt)
+    ksp(libs.hilt.compiler)
+    implementation(libs.hilt.compose)
     // Converter to automatically turn JSON into Kotlin objects
     implementation(libs.converter.gson)
     implementation(libs.java.jwt)

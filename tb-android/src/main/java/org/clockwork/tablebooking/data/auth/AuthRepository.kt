@@ -3,13 +3,27 @@ package org.clockwork.tablebooking.data.auth
 import android.util.Log
 import com.auth0.jwt.JWT
 import org.clockwork.tablebooking.dto.security.LoginView
+import org.clockwork.tablebooking.dto.security.RegistrationView
 import org.clockwork.tablebooking.dto.user.UserJwtView
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class AuthRepository(val apiService: AuthApiService) {
+@Singleton
+class AuthRepository @Inject constructor(val apiService: AuthApiService) {
 
-    suspend fun registerUser(login: String, password: String): Result<UserJwtView> {
+    suspend fun registerUser(
+        name: String,
+        surname: String,
+        login: String,
+        password: String
+    ): Result<UserJwtView> {
         return try {
-            val response = apiService.login(LoginView(login, password))
+            val response = apiService.register(RegistrationView(
+                login,
+                password,
+                name,
+                surname
+            ))
             val userView = UserJwtView.fromJwt(
                 JWT.decode(response.token).claims.mapValues { it.value.asString() }
             )

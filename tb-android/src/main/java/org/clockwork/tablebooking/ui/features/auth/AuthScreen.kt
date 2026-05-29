@@ -1,67 +1,75 @@
 package org.clockwork.tablebooking.ui.features.auth
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
-import org.clockwork.tablebooking.ui.components.InputField
-import org.clockwork.tablebooking.ui.theme.primaryLight
-import org.clockwork.tablebooking.ui.theme.secondaryLight
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import org.clockwork.tablebooking.ui.components.LogoBig
+import org.clockwork.tablebooking.ui.components.TitleText
+import org.clockwork.tablebooking.ui.navigation.Auth
+import org.clockwork.tablebooking.ui.theme.AppTheme
 
 @Composable
-fun LoginScreen(
-    viewModel: AuthViewModel = viewModel(factory = AuthViewModel.Factory)
-) {
-    val loginState = viewModel.loginState
-    val passwordState = viewModel.passwordState
-    val uiState = viewModel.uiState
-
+fun AuthScreen() {
     Column(
         Modifier
             .fillMaxSize()
-            .padding(20.dp),
-        verticalArrangement = Arrangement.Center
     ) {
-        InputField("login", loginState, uiState !is AuthUiState.Loading)
+        Spacer(Modifier.height(40.dp))
+        LogoBig(modifier = Modifier.align(BiasAlignment.Horizontal(0f)))
 
-        Spacer(Modifier.height(10.dp))
+        Spacer(Modifier.height(20.dp))
+        TitleText("Бронирование столиков")
 
-        InputField("login", passwordState, uiState !is AuthUiState.Loading)
-
-        Spacer(Modifier.weight(1f))
-
-        Button(
-            modifier = Modifier.fillMaxWidth(),
-            enabled = !loginState.text.isEmpty() && !passwordState.text.isEmpty()
-                    && uiState !is AuthUiState.Loading,
-            onClick = viewModel::performLogin
+        val authNavController = rememberNavController()
+        NavHost(
+            authNavController,
+            startDestination = Auth.Login
         ) {
-            Row {
-                Text(if (uiState is AuthUiState.Loading) "Выполняется вход..." else "Войти")
-                if (uiState is AuthUiState.Loading) {
-                    CircularProgressIndicator()
-                }
+            composable<Auth.Login> {
+                val loginViewModel: LoginViewModel = hiltViewModel()
+                LoginContent(
+                    loginViewModel.uiState,
+                    loginViewModel.loginState,
+                    loginViewModel.passwordState,
+                    { loginViewModel.performLogin() },
+                    {
+                        authNavController.navigate(Auth.Registration(
+                            loginViewModel.loginState.text as String,
+                            loginViewModel.passwordState.text as String
+                        ))
+                    }
+                )
+            }
+            composable<Auth.Registration> {
+                val registrationViewModel: RegistrationViewModel = hiltViewModel()
+                RegistrationScreen(
+                    registrationViewModel.uiState,
+                    registrationViewModel.nameState,
+                    registrationViewModel.surnameState,
+                    registrationViewModel.loginState,
+                    registrationViewModel.passwordState,
+                    { registrationViewModel.performRegistration() }
+                )
             }
         }
+    }
+}
 
-        when (uiState) {
-            is AuthUiState.Success -> Text("All good, ${uiState.user.name}!", color = Color.Green)
-            is AuthUiState.Error -> Text("It brokie - $uiState")
-            else -> {}
-        }
+@Preview
+@Composable
+fun PreviewAuthScreen() {
+    AppTheme {
+        AuthScreen()
     }
 }
