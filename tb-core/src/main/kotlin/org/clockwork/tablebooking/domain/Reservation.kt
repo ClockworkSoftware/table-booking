@@ -1,10 +1,11 @@
 package org.clockwork.tablebooking.domain
 
 import jakarta.persistence.*
+import org.clockwork.tablebooking.dto.reservation.ReservationView
 import java.time.Instant
 
 @Entity
-data class Reservation (
+class Reservation (
     var start: Instant,
     var finish: Instant,
     var begun: Boolean,
@@ -23,6 +24,16 @@ data class Reservation (
     fun intersects(otherStart: Instant, otherEnd: Instant): Boolean {
         val range = start..finish
         return otherStart in range || otherEnd in range
+    }
+
+    fun toDto(): ReservationView {
+        return ReservationView(
+            start,
+            finish,
+            begun,
+            client.toDto(),
+            place.toDto()
+        )
     }
 
 }

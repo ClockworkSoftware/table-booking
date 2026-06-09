@@ -7,7 +7,6 @@ import org.clockwork.tablebooking.domain.User
 import org.clockwork.tablebooking.dto.security.AuthenticatedUserView
 import org.clockwork.tablebooking.dto.security.LoginView
 import org.clockwork.tablebooking.dto.security.RegistrationView
-import org.clockwork.tablebooking.dto.user.UserJwtView
 import org.clockwork.tablebooking.exception.UnauthorizedException
 import org.clockwork.tablebooking.exception.UnprocessableEntityException
 import org.clockwork.tablebooking.repository.UserRepository
@@ -50,13 +49,7 @@ class AuthController(
         return JWT.create()
             .withIssuedAt(Instant.now())
             .withExpiresAt(Instant.now().plusMillis(tokenLifespan!!))
-            .withPayload(ObjectMapper().writeValueAsString(
-                UserJwtView(
-                    user.id!!.toString(),
-                    user.name,
-                    user.surname,
-                    user.role
-                ))
+            .withPayload(ObjectMapper().writeValueAsString(user.toDto().toStringFieldMap())
             )
             .sign(Algorithm.RSA256(jwtConfig))
     }

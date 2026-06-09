@@ -5,7 +5,7 @@ import org.clockwork.tablebooking.dto.place.PlaceView
 import java.time.Instant
 
 @Entity
-data class Place(
+class Place(
     @Column(unique = true)
     var labelNumber: Int,
     var reservationPrice: Double,
@@ -27,7 +27,8 @@ data class Place(
             id!!,
             labelNumber,
             reservationPrice,
-            guestCapacity
+            guestCapacity,
+            establishment.toDto()
         )
     }
 

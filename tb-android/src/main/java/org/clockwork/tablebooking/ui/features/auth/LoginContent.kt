@@ -24,8 +24,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.clockwork.tablebooking.data.auth.AuthRepository
+import org.clockwork.tablebooking.network.auth.AuthRepository
 import org.clockwork.tablebooking.ui.components.InputField
+import org.clockwork.tablebooking.ui.components.SecureInputField
 import org.clockwork.tablebooking.ui.components.SquareButton
 import org.clockwork.tablebooking.ui.components.SubtitleText
 import org.clockwork.tablebooking.ui.theme.AppTheme
@@ -37,8 +38,7 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     val repo: AuthRepository
 ) : ViewModel() {
-    private val _uiState: MutableStateFlow<LoadableUiState> =
-        MutableStateFlow(LoadableUiState.Idle)
+    private val _uiState = MutableStateFlow<LoadableUiState<out Any>>(LoadableUiState.Idle)
     val uiState = _uiState.asStateFlow()
 
     val loginState = TextFieldState()
@@ -48,7 +48,9 @@ class LoginViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { LoadableUiState.Loading }
             repo.loginUser(loginState.text as String, passwordState.text as String)
-                .onSuccess { user -> _uiState.update { LoadableUiState.Success(user) } }
+                .onSuccess { user ->
+                    _uiState.update { LoadableUiState.Success(user) }
+                }
                 .onFailure { error ->
                     _uiState.update {
                         LoadableUiState.Error(error.localizedMessage ?: "Unknown error")
@@ -60,7 +62,7 @@ class LoginViewModel @Inject constructor(
 
 @Composable
 fun LoginContent(
-    uiState: StateFlow<LoadableUiState>,
+    uiState: StateFlow<LoadableUiState<out Any>>,
     loginState: TextFieldState,
     passwordState: TextFieldState,
     onLoginButton: () -> Unit,
@@ -78,7 +80,7 @@ fun LoginContent(
         InputField("Логин", loginState, !uiState.collectAsState().isLoading())
 
         Spacer(Modifier.height(10.dp))
-        InputField("Пароль", passwordState, !uiState.collectAsState().isLoading())
+        SecureInputField("Пароль", passwordState, !uiState.collectAsState().isLoading())
 
         Spacer(Modifier.weight(1f))
 

@@ -1,8 +1,8 @@
 plugins {
     kotlin("jvm")
     kotlin("kapt")
-	kotlin("plugin.spring") version "2.2.21"
-	kotlin("plugin.jpa") version "2.2.21"
+	kotlin("plugin.spring") version "2.3.21"
+	kotlin("plugin.jpa") version "2.3.21"
 	id("org.springframework.boot") version "4.0.6"
 	id("io.spring.dependency-management") version "1.1.7"
 }
@@ -18,7 +18,6 @@ dependencies {
     // PERSISTENCE
     implementation("org.hibernate.orm:hibernate-core")
     implementation("org.hibernate.orm:hibernate-processor")
-    implementation("jakarta.data:jakarta.data-api:1.0.1")
 	implementation("tools.jackson.module:jackson-module-kotlin")
     // NEIGHBORS
     implementation(project(":tb-sdk"))

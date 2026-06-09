@@ -47,5 +47,48 @@ val AppTypography = Typography(
             )
         )
     },
-    bodyMedium = jostTextStyle()
+    headlineMedium = jostTextStyle {
+        copy(
+            fontSize = 30.sp,
+            lineHeight = 1.25.em,
+            lineBreak = LineBreak(
+                strategy = Strategy.Simple,
+                strictness = Strictness.Normal,
+                wordBreak = WordBreak.Default
+            )
+        )
+    },
+    bodyLarge = jostTextStyle {
+        copy(
+            fontSize = 28.sp,
+            lineHeight = 1.25.em,
+            lineBreak = LineBreak(
+                strategy = Strategy.Simple,
+                strictness = Strictness.Normal,
+                wordBreak = WordBreak.Default
+            )
+        )
+    },
+    bodyMedium = jostTextStyle {
+        copy(
+            fontSize = 25.sp,
+            lineHeight = 1.25.em,
+            lineBreak = LineBreak(
+                strategy = Strategy.Simple,
+                strictness = Strictness.Normal,
+                wordBreak = WordBreak.Default
+            )
+        )
+    },
+    bodySmall = jostTextStyle {
+        copy(
+            fontSize = 20.sp,
+            lineHeight = 1.25.em,
+            lineBreak = LineBreak(
+                strategy = Strategy.Simple,
+                strictness = Strictness.Normal,
+                wordBreak = WordBreak.Default
+            )
+        )
+    }
 )

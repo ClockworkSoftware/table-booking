@@ -6,7 +6,7 @@ import org.clockwork.tablebooking.dto.user.UserView
 
 @Entity
 @Table(name = "T_USER")
-data class User (
+class User (
     val name: String,
     val surname: String,
 
@@ -16,6 +16,9 @@ data class User (
 
     @Enumerated(EnumType.STRING)
     var role: UserRole,
+
+    @OneToMany(mappedBy = "owner")
+    val establishments: List<Establishment> = listOf()
 ) {
     @Id
     @GeneratedValue

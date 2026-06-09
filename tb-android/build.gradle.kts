@@ -59,6 +59,9 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.compose.constraintlayout)
+    implementation(libs.androidx.datastore.preferences)
+    implementation(libs.androidx.security)
 
     // Navigation
     implementation(libs.androidx.navigation)

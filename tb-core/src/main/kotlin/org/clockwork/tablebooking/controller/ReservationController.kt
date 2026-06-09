@@ -1,20 +1,15 @@
 package org.clockwork.tablebooking.controller
 
-import org.clockwork.tablebooking.domain.Reservation
 import org.clockwork.tablebooking.dto.reservation.ReservationSearchBody
 import org.clockwork.tablebooking.dto.reservation.ReservationSearchScope
+import org.clockwork.tablebooking.dto.reservation.ReservationView
 import org.clockwork.tablebooking.dto.user.UserRole
 import org.clockwork.tablebooking.exception.BadRequestException
 import org.clockwork.tablebooking.repository.EstablishmentRepository
 import org.clockwork.tablebooking.repository.ReservationRepository
 import org.clockwork.tablebooking.repository.findByIdOrThrow
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/public/reservation")
@@ -23,7 +18,7 @@ class ReservationController(
     val establishmentRepository: EstablishmentRepository
 ) : BaseSecuredController() {
 
-    @PostMapping("/{id}")
+    @PostMapping("/{id}/begun")
     fun logReservationBegun(@RequestParam id: Long): ResponseEntity<Unit> {
         userContext.requireRole(UserRole.WAITER)
 
@@ -38,7 +33,7 @@ class ReservationController(
     fun searchReservations(
         @RequestParam scope: ReservationSearchScope,
         @RequestBody body: ReservationSearchBody
-    ): ResponseEntity<List<Reservation>> {
+    ): ResponseEntity<List<ReservationView>> {
         return ResponseEntity.ok(
             when (scope) {
                 ReservationSearchScope.SYSTEM -> {
@@ -52,14 +47,14 @@ class ReservationController(
                     val establishmentId = body.establishmentId
                         ?: throw BadRequestException("Field \"establishmentId\" is empty")
                     val establishment = establishmentRepository.findByIdOrThrow(establishmentId)
-                    reservationRepository.findByEstablishment(establishment)
+                    reservationRepository.findByPlaceEstablishment(establishment)
                 }
 
                 ReservationSearchScope.USER -> {
                     userContext.requireRole(UserRole.CLIENT)
-                    reservationRepository.findByClientId(userContext.jwtView.sub.toLong())
+                    reservationRepository.findByClientId(userContext.currentUser.id)
                 }
-            }
+            }.map { it.toDto() }
         )
     }
 }

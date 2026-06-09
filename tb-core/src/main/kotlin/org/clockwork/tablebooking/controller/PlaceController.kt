@@ -1,40 +1,48 @@
 package org.clockwork.tablebooking.controller
 
+import jakarta.transaction.Transactional
 import org.clockwork.tablebooking.domain.Establishment
 import org.clockwork.tablebooking.domain.Place
-import org.clockwork.tablebooking.domain.Reservation
 import org.clockwork.tablebooking.dto.place.PlaceCreationView
 import org.clockwork.tablebooking.dto.place.PlaceUpdateView
 import org.clockwork.tablebooking.dto.place.PlaceView
 import org.clockwork.tablebooking.dto.reservation.ReservationCreationView
+import org.clockwork.tablebooking.dto.reservation.ReservationView
 import org.clockwork.tablebooking.dto.user.UserRole
 import org.clockwork.tablebooking.exception.EntityNotFoundException
 import org.clockwork.tablebooking.exception.UnprocessableEntityException
 import org.clockwork.tablebooking.repository.EstablishmentRepository
 import org.clockwork.tablebooking.repository.PlaceRepository
-import org.clockwork.tablebooking.repository.UserRepository
 import org.clockwork.tablebooking.repository.findByIdOrThrow
+import org.clockwork.tablebooking.service.PlaceService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/v1/public/place")
-class PlaceController (
+class PlaceController(
     val placeRepository: PlaceRepository,
     val establishmentRepository: EstablishmentRepository,
-    val userRepository: UserRepository
+
+    val placeService: PlaceService
 ) : BaseSecuredController() {
 
+    @Transactional
     @PostMapping
-    fun createPlace(@RequestBody body: PlaceCreationView): ResponseEntity<Unit> {
+    fun createPlace(@RequestBody body: PlaceCreationView): ResponseEntity<PlaceView> {
         userContext.requireRole(UserRole.ADMIN)
 
         if (placeRepository.findByLabelNumber(body.labelNumber).isPresent)
             throw UnprocessableEntityException("Place labelled ${body.labelNumber} already exists!")
         val establishment = establishmentRepository.findById(body.establishmentId)
-            .orElseThrow { EntityNotFoundException(Establishment::class.simpleName!!, body.establishmentId) }
+            .orElseThrow {
+                EntityNotFoundException(
+                    Establishment::class.simpleName!!,
+                    body.establishmentId
+                )
+            }
 
-        placeRepository.save(body.run {
+        val place = placeRepository.save(body.run {
             Place(
                 labelNumber,
                 reservationPrice,
@@ -43,37 +51,31 @@ class PlaceController (
             )
         })
 
-        return ResponseEntity.status(201).build()
+        return ResponseEntity.status(201).body(place.toDto())
     }
 
     @PostMapping("/{id}/reserve")
-    fun createReservation(
-        @RequestParam id: Long,
+    fun reserve(
+        @PathVariable id: Long,
         @RequestBody body: ReservationCreationView
-    ) : ResponseEntity<Reservation> {
-        val place = placeRepository.findByIdOrThrow(id)
-        if (place.isFreeBetween(body.start, body.finish))
-            throw UnprocessableEntityException("At this time the specified place is already reserved!")
-        val user = userRepository.findByIdOrThrow(body.clientId ?: userContext.jwtView.sub.toLong())
-
-        val reservation = Reservation(
-            body.start,
-            body.finish,
-            false,
-            user,
-            place
+    ): ResponseEntity<ReservationView> {
+        val reservation = placeService.makeReservation(
+            id,
+            body,
+            userContext.currentUser.id
         )
-
-        return ResponseEntity.ok(reservation)
+        return ResponseEntity.ok(reservation.toDto())
     }
 
+    @Transactional
     @GetMapping
     fun getPlaces(): ResponseEntity<List<PlaceView>> {
         return ResponseEntity.ok(placeRepository.findAll().map { it.toDto() })
     }
 
+    @Transactional
     @GetMapping("{id}")
-    fun getPlace(@RequestParam id: Long): ResponseEntity<PlaceView> {
+    fun getPlace(@PathVariable id: Long): ResponseEntity<PlaceView> {
         return placeRepository.findByIdOrThrow(id).let { ResponseEntity.ok(it.toDto()) }
     }
 
@@ -93,7 +95,7 @@ class PlaceController (
     }
 
     @DeleteMapping("{id}")
-    fun removePlace(@RequestParam id: Long): ResponseEntity<Unit> {
+    fun removePlace(@PathVariable id: Long): ResponseEntity<Unit> {
         userContext.requireRole(UserRole.ADMIN)
 
         placeRepository.deleteById(id)

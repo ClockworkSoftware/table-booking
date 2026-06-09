@@ -1,4 +1,4 @@
-package org.clockwork.tablebooking.data.auth
+package org.clockwork.tablebooking.network.auth
 
 import org.clockwork.tablebooking.dto.security.AuthenticatedUserView
 import org.clockwork.tablebooking.dto.security.LoginView

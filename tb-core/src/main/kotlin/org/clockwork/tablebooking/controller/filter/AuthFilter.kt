@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import org.apache.logging.log4j.kotlin.Logging
 import org.clockwork.tablebooking.domain.User
-import org.clockwork.tablebooking.dto.user.UserJwtView
+import org.clockwork.tablebooking.dto.user.UserView
 import org.clockwork.tablebooking.exception.UnauthorizedException
 import org.clockwork.tablebooking.util.UserContext
 import org.springframework.beans.factory.annotation.Value
@@ -42,8 +42,8 @@ class AuthFilter (
         val jwt = JWT.decode(authHeader.substring("Bearer ".length))
         logger.debug { jwt.claims.mapValues { it.value.toString() }.toString() }
 
-        userContext.jwtView = UserJwtView.fromJwt(jwt.claims.mapValues { it.value.asString() })
-        logger.debug("Authenticated user ${userContext.jwtView.name}")
+        userContext.currentUser = UserView.fromJwt(jwt.claims.mapValues { it.value.asString() })
+        logger.debug("Authenticated user ${userContext.currentUser.name}")
 
         filterChain.doFilter(request, response)
     }

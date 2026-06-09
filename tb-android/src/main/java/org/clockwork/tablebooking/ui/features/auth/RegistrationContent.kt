@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.SavedStateHandle
@@ -26,9 +25,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.clockwork.tablebooking.data.auth.AuthRepository
+import org.clockwork.tablebooking.network.auth.AuthRepository
 import org.clockwork.tablebooking.ui.components.InputField
-import org.clockwork.tablebooking.ui.components.LogoBig
 import org.clockwork.tablebooking.ui.components.SquareButton
 import org.clockwork.tablebooking.ui.components.SubtitleText
 import org.clockwork.tablebooking.ui.theme.AppTheme
@@ -41,7 +39,7 @@ class RegistrationViewModel @Inject constructor(
     val repo: AuthRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    private val _uiState: MutableStateFlow<LoadableUiState> =
+    private val _uiState: MutableStateFlow<LoadableUiState<out Any>> =
         MutableStateFlow(LoadableUiState.Idle)
     val uiState = _uiState.asStateFlow()
 
@@ -71,7 +69,7 @@ class RegistrationViewModel @Inject constructor(
 
 @Composable
 fun RegistrationScreen(
-    uiState: StateFlow<LoadableUiState>,
+    uiState: StateFlow<LoadableUiState<out Any>>,
     nameState: TextFieldState,
     surnameState: TextFieldState,
     loginState: TextFieldState,

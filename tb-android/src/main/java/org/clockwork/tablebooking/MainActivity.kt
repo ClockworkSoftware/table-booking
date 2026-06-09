@@ -8,12 +8,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.AndroidEntryPoint
 import org.clockwork.tablebooking.ui.features.auth.AuthScreen
+import org.clockwork.tablebooking.ui.features.home.HomeScreen
+import org.clockwork.tablebooking.ui.features.home.ReservationsViewModel
 import org.clockwork.tablebooking.ui.navigation.Auth
+import org.clockwork.tablebooking.ui.navigation.Home
 import org.clockwork.tablebooking.ui.theme.AppTheme
 
 @AndroidEntryPoint
@@ -28,7 +32,19 @@ class MainActivity : ComponentActivity() {
                         val topLevelNavController = rememberNavController()
 
                         NavHost(topLevelNavController, startDestination = Auth) {
-                            composable<Auth> { AuthScreen() }
+                            composable<Auth> {
+                                AuthScreen {
+                                    topLevelNavController.navigate(Home)
+                                }
+                            }
+                            composable<Home> {
+                                val reservationsViewModel: ReservationsViewModel =
+                                    hiltViewModel<ReservationsViewModel>()
+                                        .also { it.loadReservations() }
+                                HomeScreen(
+                                    reservationsViewModel.uiState
+                                )
+                            }
                         }
                     }
                 }
