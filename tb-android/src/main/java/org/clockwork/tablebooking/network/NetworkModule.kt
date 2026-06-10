@@ -8,6 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import okhttp3.OkHttpClient
 import org.clockwork.tablebooking.network.auth.AuthApiService
+import org.clockwork.tablebooking.network.establishment.EstablishmentApiService
 import org.clockwork.tablebooking.network.reservation.ReservationApiService
 import org.clockwork.tablebooking.network.util.InstantTypeAdapter
 import retrofit2.Retrofit
@@ -54,7 +55,13 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun provideReservationRepository(retrofit: Retrofit): ReservationApiService {
+    fun provideReservationService(retrofit: Retrofit): ReservationApiService {
         return retrofit.create(ReservationApiService::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideEstablishmentService(retrofit: Retrofit): EstablishmentApiService {
+        return retrofit.create(EstablishmentApiService::class.java)
     }
 }

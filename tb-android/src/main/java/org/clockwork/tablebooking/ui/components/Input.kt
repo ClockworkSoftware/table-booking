@@ -20,16 +20,6 @@ import androidx.compose.ui.unit.dp
 import org.clockwork.tablebooking.ui.theme.AppTheme
 
 @Composable
-fun InputField(label: String, state: TextFieldState, enabled: Boolean = true) {
-    OutlinedTextField(
-        label = { Text(label) },
-        state = state,
-        enabled = enabled,
-        modifier = Modifier.fillMaxWidth()
-    )
-}
-
-@Composable
 fun SecureInputField(label: String, state: TextFieldState, enabled: Boolean = true) {
     OutlinedSecureTextField(
         label = { Text(label) },
@@ -41,11 +31,12 @@ fun SecureInputField(label: String, state: TextFieldState, enabled: Boolean = tr
 }
 
 @Composable
-fun SquareButton(
+fun RoundedSquareButton(
     modifier: Modifier = Modifier,
     backgroundColor: Color = MaterialTheme.colorScheme.surfaceBright,
     contentColor: Color = MaterialTheme.colorScheme.inverseSurface,
     enabled: Boolean = true,
+    roundTopHalfOnly: Boolean = false,
     onClick: () -> Unit = {},
     content: @Composable RowScope.() -> Unit
 ) {
@@ -57,7 +48,8 @@ fun SquareButton(
             contentColor = contentColor
         ),
         border = BorderStroke(2.dp, MaterialTheme.colorScheme.primary),
-        shape = RoundedCornerShape(10.dp),
+        shape = if (roundTopHalfOnly) RoundedCornerShape(10.dp, 10.dp)
+            else RoundedCornerShape(10.dp),
         modifier = modifier,
         content = content
     )
@@ -65,9 +57,9 @@ fun SquareButton(
 
 @Preview
 @Composable
-fun PreviewSquareButton() {
+fun PreviewRoundedSquareButton() {
     AppTheme {
-        SquareButton {
+        RoundedSquareButton {
             Text("Lorem ipsum dolor sit amet")
         }
     }

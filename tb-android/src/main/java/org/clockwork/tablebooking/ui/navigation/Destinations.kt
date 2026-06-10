@@ -15,4 +15,11 @@ object Auth {
 }
 
 @Serializable
-object Home
+object Home {
+
+    @Serializable
+    object ReservationsList
+
+    @Serializable
+    object ReservationCreation
+}

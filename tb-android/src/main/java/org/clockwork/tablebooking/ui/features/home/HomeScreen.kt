@@ -11,6 +11,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -24,6 +26,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -40,6 +45,8 @@ import org.clockwork.tablebooking.ui.components.BodyText
 import org.clockwork.tablebooking.ui.components.HeaderText
 import org.clockwork.tablebooking.ui.components.LogoSmall
 import org.clockwork.tablebooking.ui.components.LogoutIcon
+import org.clockwork.tablebooking.ui.components.RoundedSquareButton
+import org.clockwork.tablebooking.ui.navigation.Home
 import org.clockwork.tablebooking.ui.theme.AppTheme
 import org.clockwork.tablebooking.ui.util.LoadableUiState
 import java.time.Instant
@@ -57,7 +64,13 @@ class ReservationsViewModel @Inject constructor(
             _uiState.update { LoadableUiState.Loading }
             reservationRepo.getAllOwned()
                 .onSuccess { result -> _uiState.update { LoadableUiState.Success(result) } }
-                .onFailure { result -> _uiState.update { LoadableUiState.Error(result.message ?: "error") } }
+                .onFailure { result ->
+                    _uiState.update {
+                        LoadableUiState.Error(
+                            result.message ?: "error"
+                        )
+                    }
+                }
         }
     }
 }
@@ -71,38 +84,70 @@ fun HomeScreen(
     ) {
         HeaderBar()
 
-        when (val state = uiState.collectAsState().value) {
-            is LoadableUiState.Loading -> {
-                Spacer(Modifier.weight(1f))
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    BodyText("Данные загружаются...")
-                    CircularProgressIndicator()
-                }
-                Spacer(Modifier.weight(1f))
-            }
+        val homeNavController = rememberNavController()
+        NavHost(
+            navController = homeNavController,
+            startDestination = Home.ReservationsList
+        ) {
+            composable<Home.ReservationsList> {
+                when (val state = uiState.collectAsState().value) {
+                    is LoadableUiState.Loading -> {
+                        Spacer(Modifier.weight(1f))
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            BodyText("Данные загружаются...")
+                            CircularProgressIndicator()
+                        }
+                        Spacer(Modifier.weight(1f))
+                    }
 
-            is LoadableUiState.Error -> {
-                Spacer(Modifier.weight(1f))
-                BodyText(
-                    "Произошла ошибка. Уже разбираемся...",
-                    center = true,
-                    modifier = Modifier.align(Alignment.CenterHorizontally)
-                )
-                Spacer(Modifier.weight(1f))
-            }
+                    is LoadableUiState.Error -> {
+                        Spacer(Modifier.weight(1f))
+                        BodyText(
+                            "Произошла ошибка. Уже разбираемся...",
+                            center = true,
+                            modifier = Modifier.align(Alignment.CenterHorizontally)
+                        )
+                        Spacer(Modifier.weight(1f))
+                    }
 
-            is LoadableUiState.Success<*> -> {
-                (state.result as? List<ReservationView>)?.let {
-                    Box(
-                        Modifier.padding(10.dp)
-                    ) {
-                        ReservationsList(it)
+                    is LoadableUiState.Success<*> -> {
+                        (state.result as? List<ReservationView>)?.let {
+                            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+                                Box(
+                                    Modifier.padding(10.dp)
+                                ) {
+                                    ReservationsList(it)
+                                }
+
+                                Spacer(Modifier.weight(1f))
+
+                                RoundedSquareButton(
+                                    modifier = Modifier
+                                        .fillMaxWidth(),
+                                    backgroundColor = MaterialTheme.colorScheme.primaryContainer,
+                                    roundTopHalfOnly = true
+                                ) {
+                                    HeaderText("Забронировать место")
+                                }
+                            }
+                        }
                     }
                 }
             }
+
+//            composable<Home.ReservationCreation> {
+//
+//                ReservationCreationContent(TextFieldState(),
+//                    {},
+//                    listOf(
+//                        "ул. свободы"
+//                    ),
+//                    dateState.asStateFlow()) { }
+//            }
         }
+
     }
 }
 

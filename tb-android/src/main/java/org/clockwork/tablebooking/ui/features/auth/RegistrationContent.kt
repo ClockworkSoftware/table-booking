@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -26,8 +27,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.clockwork.tablebooking.network.auth.AuthRepository
-import org.clockwork.tablebooking.ui.components.InputField
-import org.clockwork.tablebooking.ui.components.SquareButton
+import org.clockwork.tablebooking.ui.components.RoundedSquareButton
+import org.clockwork.tablebooking.ui.components.SecureInputField
 import org.clockwork.tablebooking.ui.components.SubtitleText
 import org.clockwork.tablebooking.ui.theme.AppTheme
 import org.clockwork.tablebooking.ui.util.LoadableUiState
@@ -85,20 +86,29 @@ fun RegistrationScreen(
         SubtitleText("Регистрация", Modifier.align(BiasAlignment.Horizontal(0f)))
 
         Spacer(Modifier.height(20.dp))
-        InputField("Имя", nameState, !uiState.collectAsState().isLoading())
+        OutlinedTextField(
+            label = { Text("Имя") },
+            state = nameState,
+            enabled = !uiState.collectAsState().isLoading())
 
         Spacer(Modifier.height(10.dp))
-        InputField("Фамилия", surnameState, !uiState.collectAsState().isLoading())
+        OutlinedTextField(
+            label = { Text("Фамилия") },
+            state = surnameState,
+            enabled = !uiState.collectAsState().isLoading())
 
         Spacer(Modifier.height(10.dp))
-        InputField("Логин", loginState, !uiState.collectAsState().isLoading())
+        OutlinedTextField(
+            label = { Text("Логин") },
+            state = loginState,
+            enabled = !uiState.collectAsState().isLoading())
 
         Spacer(Modifier.height(10.dp))
-        InputField("Пароль", passwordState, !uiState.collectAsState().isLoading())
+        SecureInputField("Пароль", passwordState, !uiState.collectAsState().isLoading())
 
         Spacer(Modifier.weight(1f))
 
-        SquareButton(
+        RoundedSquareButton(
             modifier = Modifier
                 .fillMaxWidth(),
             backgroundColor = MaterialTheme.colorScheme.primaryContainer,

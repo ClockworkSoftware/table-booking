@@ -80,3 +80,25 @@ fun CrossSign(modifier: Modifier = Modifier, isCross: Boolean = true) {
             .rotate(if (isCross) 0f else 45f)
     )
 }
+
+@Composable
+fun BuildingIcon() {
+    Image(
+        painter = painterResource(R.drawable.building), contentDescription = null,
+        modifier = Modifier.aspectRatio(1f)
+    )
+}
+
+@Composable
+fun CalendarIcon() {
+    Image(
+        painter = painterResource(R.drawable.calendar), contentDescription = null
+    )
+}
+
+@Composable
+fun ClockIcon() {
+    Image(
+        painter = painterResource(R.drawable.clock), contentDescription = null
+    )
+}
