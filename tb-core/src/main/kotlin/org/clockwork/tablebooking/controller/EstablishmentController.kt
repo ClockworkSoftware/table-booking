@@ -9,7 +9,12 @@ import org.clockwork.tablebooking.repository.EstablishmentRepository
 import org.clockwork.tablebooking.repository.UserRepository
 import org.clockwork.tablebooking.repository.findByIdOrThrow
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/v1/public/establishment")
@@ -20,8 +25,6 @@ class EstablishmentController (
 
     @GetMapping
     fun getAll(): ResponseEntity<List<EstablishmentView>> {
-        userContext.requireRole(UserRole.ADMIN)
-
         return ResponseEntity.ok(establishmentRepository.findAll().map(Establishment::toDto))
     }
 
@@ -35,16 +38,16 @@ class EstablishmentController (
     @PostMapping
     fun createEstablishment(
         @RequestBody body: EstablishmentCreationShared
-    ): ResponseEntity<Unit> {
+    ): ResponseEntity<EstablishmentView> {
         userContext.requireRole(UserRole.ADMIN)
         establishmentRepository.findByAddress(body.address).ifPresent { throw UnprocessableEntityException(
             "Establishment entity with address ${body.address} already exists") }
 
         val user = userRepository.findByIdOrThrow(body.ownerId)
         val establishment = Establishment(body.address, user)
-        establishmentRepository.save(establishment)
+        val result = establishmentRepository.save(establishment).toDto()
 
-        return ResponseEntity.status(201).build()
+        return ResponseEntity.status(201).body(result)
     }
 
 }

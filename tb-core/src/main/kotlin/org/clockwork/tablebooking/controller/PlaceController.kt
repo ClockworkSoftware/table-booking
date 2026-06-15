@@ -16,7 +16,15 @@ import org.clockwork.tablebooking.repository.PlaceRepository
 import org.clockwork.tablebooking.repository.findByIdOrThrow
 import org.clockwork.tablebooking.service.PlaceService
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/api/v1/public/place")
@@ -26,6 +34,24 @@ class PlaceController(
 
     val placeService: PlaceService
 ) : BaseSecuredController() {
+
+    @Transactional
+    @GetMapping
+    fun getPlaces(): ResponseEntity<List<PlaceView>> {
+        return ResponseEntity.ok(placeRepository.findAll().map { it.toDto() })
+    }
+
+    @Transactional
+    @GetMapping("{id}")
+    fun getPlace(@PathVariable id: Long): ResponseEntity<PlaceView> {
+        return placeRepository.findByIdOrThrow(id).let { ResponseEntity.ok(it.toDto()) }
+    }
+
+    @Transactional
+    @GetMapping("search")
+    fun search(@RequestParam establishmentId: Long): ResponseEntity<List<PlaceView>> {
+        return ResponseEntity.ok(placeService.search(establishmentId))
+    }
 
     @Transactional
     @PostMapping
@@ -54,31 +80,6 @@ class PlaceController(
         return ResponseEntity.status(201).body(place.toDto())
     }
 
-    @PostMapping("/{id}/reserve")
-    fun reserve(
-        @PathVariable id: Long,
-        @RequestBody body: ReservationCreationView
-    ): ResponseEntity<ReservationView> {
-        val reservation = placeService.makeReservation(
-            id,
-            body,
-            userContext.currentUser.id
-        )
-        return ResponseEntity.ok(reservation.toDto())
-    }
-
-    @Transactional
-    @GetMapping
-    fun getPlaces(): ResponseEntity<List<PlaceView>> {
-        return ResponseEntity.ok(placeRepository.findAll().map { it.toDto() })
-    }
-
-    @Transactional
-    @GetMapping("{id}")
-    fun getPlace(@PathVariable id: Long): ResponseEntity<PlaceView> {
-        return placeRepository.findByIdOrThrow(id).let { ResponseEntity.ok(it.toDto()) }
-    }
-
     @PutMapping
     fun updatePlace(@RequestBody body: PlaceUpdateView): ResponseEntity<PlaceView> {
         userContext.requireRole(UserRole.ADMIN)
@@ -102,4 +103,16 @@ class PlaceController(
         return ResponseEntity.ok().build()
     }
 
+    @PostMapping("/{id}/reserve")
+    fun reserve(
+        @PathVariable id: Long,
+        @RequestBody body: ReservationCreationView
+    ): ResponseEntity<ReservationView> {
+        val reservation = placeService.makeReservation(
+            id,
+            body,
+            userContext.currentUser.id
+        )
+        return ResponseEntity.ok(reservation.toDto())
+    }
 }
